@@ -7,10 +7,11 @@ class BasicGame: Game
 {
     GraphicsDeviceManager graphics;
     SpriteBatch spriteBatch;
-    Texture2D player1, player2;
+    Texture2D player1, player2, bal;
     Texture2D background;
-    Vector2 player1Positie, player2Positie;
+    Vector2 player1Positie, player2Positie, balPositie, balSnelheid;
     KeyboardState currentKeyboard;
+    bool moving = false;
 
     [STAThread]
     static void Main()
@@ -29,6 +30,8 @@ class BasicGame: Game
         Content.RootDirectory = "Content";
         player1Positie = new Vector2(0, 468);
         player2Positie = new Vector2(1896, 468);
+        balPositie = new Vector2(948, 528);
+        balSnelheid = new Vector2(4, 4);       
     }
 
     protected override void LoadContent()
@@ -37,11 +40,15 @@ class BasicGame: Game
         player1 = Content.Load<Texture2D>("blauweSpelerBig");
         player2 = Content.Load<Texture2D>("rodeSpelerBig");
         background = Content.Load<Texture2D>("pongBackground");
+        bal = Content.Load<Texture2D>("bigBal");
     }
 
     protected override void Update(GameTime gameTime)
     {       
         currentKeyboard = Keyboard.GetState();
+        Rectangle player1Bounds = player1.Bounds;
+        Rectangle player2Bounds = player2.Bounds;
+        Rectangle balBounds = bal.Bounds;
 
         if (currentKeyboard.IsKeyDown(Keys.Escape))
         {
@@ -83,6 +90,23 @@ class BasicGame: Game
         {
             player2Positie.Y = 936;
         }
+
+        if (moving == true)
+        {
+            if (balPositie.Y <= 0)
+            {
+                balSnelheid.Y *= -1;
+            }
+            if (balPositie.Y >= 1056)
+            {
+                balSnelheid.Y *= -1;
+            }
+            balPositie += balSnelheid;
+        }
+        else if (currentKeyboard.IsKeyDown(Keys.Space))
+        {
+            moving = true;
+        }
     }
 
     protected override void Draw(GameTime gameTime)
@@ -91,6 +115,7 @@ class BasicGame: Game
         spriteBatch.Draw(background, Vector2.Zero, Color.White);
         spriteBatch.Draw(player1, player1Positie, Color.White);
         spriteBatch.Draw(player2, player2Positie, Color.White);
+        spriteBatch.Draw(bal, balPositie, Color.White);
         spriteBatch.End();
     }
 }
